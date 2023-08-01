@@ -6,8 +6,8 @@
 
 document.getElementById("rzp-button1").onclick = function (e) {
   var options = {
-    key: "<API_KEY>", // Enter the Key ID generated from the Dashboard
-    amount: 300 * 100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    key: "rzp_test_IB6q1UHxycj3gs", // Enter the Key ID generated from the Dashboard
+    amount: parseFloat(JSON.parse(window.localStorage.getItem('amount')))*100, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
     currency: "INR",
     name: "MyShop Checkout",
     description: "This is your order", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
@@ -21,5 +21,10 @@ document.getElementById("rzp-button1").onclick = function (e) {
   var rzpy1 = new Razorpay(options);
   rzpy1.open();
   // clear mycart - localStorage
+  rzpy1.on('payment.success', function (response) {
+    console.log("Payment success:", response);
+    // Clear my cart - localStorage after successful payment
+    window.localStorage.setItem('cartProducts', []);
+  });
   e.preventDefault();
 };
