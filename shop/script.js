@@ -286,6 +286,34 @@ const colorForm = document.getElementById('colorForm');
 
         });
 
+//search bar
+const searchInput = document.querySelector('.searchbar__box');
+
+searchInput.addEventListener('keydown', (event) => {
+  if(event.key === 'Enter') {
+    const serachText = searchInput.value;
+    performSearch(serachText);
+  }
+})
+
+const performSearch = (serachText) => {
+    async function getSearchProducts() {
+      const productsDiv = document.querySelector('.products');
+      const products = productsDiv.querySelectorAll('.product');  
+      productsDiv.innerHTML = '';
+
+      products.forEach((p) => {
+
+        const curTitle = p.querySelector('.title > span').textContent;
+        console.log(p);
+        if(curTitle == serachText) {
+          productsDiv.appendChild(p);
+        }
+      })
+    }
+    getSearchProducts();
+}
+
 //navigation
 
 document.querySelector('.home').addEventListener('click',() => {

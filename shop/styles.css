@@ -88,6 +88,7 @@ aside {
 .searchbar > Input {
   border: none;
   outline: none;
+  width: 100%;
 }
 
 .recommendations {
