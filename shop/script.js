@@ -9,6 +9,8 @@
 //   rating: { rate: 3.9, count: 120 },
 // };
 
+//const { number } = require("prop-types");
+
 // myProducts.filter((item)=>item.title.includes(search.value))
 
 // myCartProductArray = myProducts.filter((item)=> myCartIDs.includes(item.id))
@@ -180,23 +182,107 @@ const colorForm = document.getElementById('colorForm');
             console.log('Selected Rating:', selectedRating);
             console.log('Selected Prices:', selectedPrices);
 
-            async function displayProducts() {
-              const res = await fetch('https://fakestoreapi.com/products');
-              const products = await res.json();   
-              productsDiv.innerHTML = '';
+            const ProductsDiv = document.querySelector('.products');
+            const allProducts = productsDiv.querySelectorAll('.product');
+            
 
-              products.forEach((p) => {
-                let eligible = true;
+            const updatedProducts = [];
 
-                //color
+            allProducts.forEach((prod) => {
+              let isEligible = true;
 
-                //size
-
-                //rating
-
-                //price
-              })
+              //color
+              if (selectedColors.length > 0) {
+                const cat = prod.querySelector('.category').textContent;
+                
+                if (cat == "Category: men's clothing" || cat == "Category: women's clothing") {
+                    let flagColor = false;
+            
+                    const circles = prod.querySelectorAll('.circle');
+            
+                    selectedColors.forEach((selectedColor) => {
+                        const selectedHexColor = colorNameToHex(selectedColor);
+            
+                        circles.forEach((curCircle) => {
+                            const circleStyle = getComputedStyle(curCircle);
+                            const circleColor = circleStyle.backgroundColor;
+                            const circleHexColor = rgbToHex(circleColor);
+            
+                            if (selectedHexColor.toLowerCase() === circleHexColor.toLowerCase()) {
+                                flagColor = true;
+                            }
+                        });
+                    });
+            
+                    if (!flagColor) {
+                        isEligible = false;
+                    }
+                } else {
+                    isEligible = false;
+                }
             }
+            
+            function rgbToHex(rgb) {
+                return "#" + rgb.match(/\d+/g).map(Number)
+                    .map(component => {
+                        return (component < 16 ? "0" : "") + component.toString(16);
+                    }).join("");
+            }
+            
+            function colorNameToHex(colorName) {
+                const colorElem = document.createElement('div');
+                colorElem.style.color = colorName;
+                document.body.appendChild(colorElem);
+                const computedColor = getComputedStyle(colorElem).color;
+                document.body.removeChild(colorElem);
+                return rgbToHex(computedColor);
+            }
+               
+              //size
+
+              if(selectedSizes.length > 0) {
+                
+              }
+
+              //Rating
+              const prodRating = prod.querySelector('.rating').textContent;
+              const starCount = (prodRating.match(/🌟/g) || []).length;
+              if(starCount < selectedRating) {
+                isEligible = false;
+              }
+              //prices
+
+              selectedPrices.forEach((curPrice) => {
+                const minmax = curPrice.split('-');
+            
+                minmax[0] = parseFloat(minmax[0]);
+                if (typeof minmax[1] === "number") minmax[1] = parseFloat(minmax[1]);
+            
+                const price = prod.querySelector('.price__size > span').textContent;
+                const numericValue = parseFloat(price.replace('$', ''));
+            
+                if (minmax[0] === 100) {
+                    if (!(numericValue >= 100)) {
+                        isEligible = false;
+                    }
+                } else {
+                    if (!(numericValue >= minmax[0]  && numericValue <= minmax[1])) {
+                        isEligible = false;
+                    }
+                }
+            });
+
+              //if eligible push the product
+              if(isEligible) updatedProducts.push(prod);
+            })
+
+            productsDiv.innerHTML = ``;
+
+            updatedProducts.forEach((updatedProduct) => {
+              productsDiv.appendChild(updatedProduct);
+            })
+
+            console.log(updatedProducts);
 
         });
 
